@@ -1,4 +1,5 @@
 # do not delete new line at the end of log_out file"
+#always use this file for parsing (until get-descriptor is fixed)
 from rdkit import Chem
 import os
 import numpy as np
@@ -9,8 +10,8 @@ import csv
 def main():
   #file_path = "/Users/zinatsayeeda/anaconda3/envs/rdkit/test_1/log_out_2.txt"
   #file_path = "/Users/zinatsayeeda/anaconda3/envs/rdkit/test_3/log_out.txt"
-  #file_path = "/Users/zinatsayeeda/anaconda3/envs/rdkit/dataset/dataset_1st_priority/log_out.txt"
-  file_path = "/Users/zinatsayeeda/anaconda3/envs/rdkit/dataset/dataset_2nd_priority/log_out.txt"
+  file_path = "/Users/zinatsayeeda/anaconda3/envs/rdkit/dataset/dataset_1st_priority/log_out.txt" # change here the file name
+  #file_path = "/Users/zinatsayeeda/anaconda3/envs/rdkit/dataset/dataset_2nd_priority/log_out.txt"
   file_text = open(file_path).read()
   file_blocks = file_text.split("file entry in create structure:")
   dataset_array = []
@@ -46,7 +47,7 @@ def main():
       descriptors_final_values.append(descriptors) 
     descriptors_final_values.pop(0)
     print("For block:{}, HMDB IDs:{}, H Positions:{} and Descriptor Values:{}".format(i, hmdb_id,hydrogen_position,descriptors_final_values))
-    chem_file_path = "/Users/zinatsayeeda/anaconda3/envs/rdkit/dataset/dataset_2nd_priority/"+array_of_lines_in_each_block[0].split(".sdf")[0] #change the path here
+    chem_file_path = "/Users/zinatsayeeda/anaconda3/envs/rdkit/dataset/dataset_1st_priority/"+array_of_lines_in_each_block[0].split(".sdf")[0] #change the path here
     print("chem file path:{}".format(chem_file_path))
     H_position_and_chemicalshift_in_shift_file = ReadShiftFile1(chem_file_path,hydrogen_position)
     print("in chemical shift file{}".format(H_position_and_chemicalshift_in_shift_file))
@@ -57,7 +58,7 @@ def main():
           dataset_array.append({"descriptor": descriptors_final_values[i], "chemical_shift": d["chemical_shift"], "HMDB_ID": hmdb_id[0], "hydrogen_position": d["H_position"]})
   print("Final Dataset:{}".format(dataset_array))
   #with open('/Users/zinatsayeeda/anaconda3/envs/rdkit/test_1/holdout_nmr.csv', 'w') as csv_file:
-  with open('/Users/zinatsayeeda/anaconda3/envs/rdkit/dataset/dataset_2nd_priority/training_nmr_2nd_priority.csv', 'w') as csv_file: #change path and file name here too
+  with open('/Users/zinatsayeeda/anaconda3/envs/rdkit/dataset/dataset_1st_priority/training_nmr_1st_priority.csv', 'w') as csv_file: #change path and file name here too
     writer = csv.writer(csv_file)
     writer.writerow(header)
     for i in range(len(dataset_array)):
@@ -70,7 +71,7 @@ def main():
 
 
 #don't use it for now    
-def ReadShiftFile1(file_name):
+def ReadShiftFile(file_name):
   H_position_and_chemicalshift_in_shift_file = [] # this returns after checking "O" and "N" as neighbor atoms
   hydrogen_positions_in_mol_file = []
   with open(file_name+".txt", "r") as fp:

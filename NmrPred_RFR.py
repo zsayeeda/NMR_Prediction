@@ -148,7 +148,7 @@ def runPredictionWithCDK(trainingSetFile, testData):
         print("X portion of dataset:{}".format(X))
         y =  dataset.iloc[1:,-3].values # it was -1 before for xuan's dataset
         y = y.astype(float)
-        y = [round(i,3) for i in y]
+        y = [round(i,2) for i in y]
         y = np.asarray(y)
         #Y = y.reshape(y.shape[0],1)
         Y = y.ravel()

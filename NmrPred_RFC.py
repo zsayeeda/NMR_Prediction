@@ -180,6 +180,8 @@ def runPredictionWithCDK(trainingSetFile, testData):
         print("This is how the dataset looks like after converting to np array:{}".format(dataset))
         hmdb_ids = dataset.iloc[1:,-2].values # it was -1 before for xuan's dataset
         hmdb_ids = hmdb_ids.reshape(hmdb_ids.shape[0],1)
+        hydrogen_positions = dataset.iloc[1:,-1].values
+        hydrogen_positions = hydrogen_positions.reshape(hydrogen_positions.shape[0],1)
         X = dataset.iloc[1: , 0:-3].values # it was -2 before for xuan's dataset
         X = X.astype(float)
         print("X portion of dataset:{}".format(X))
@@ -246,7 +248,7 @@ def runPredictionWithCDK(trainingSetFile, testData):
         outlier_num = 0
         test_arbitary = 0
         for j in range(len(y_pred)):
-            print("Printing prediction:{}------true:{} and HMDB_ID:{}".format(y_pred[j], y_test[j],hmdb_ids[j]))
+            print("Printing prediction:{}------true:{}, HMDB_ID:{} and H position is:{}".format(y_pred[j], y_test[j],hmdb_ids[j],hydrogen_positions[j]))
             if abs(y_pred[j] - y_test[j]) <= 8.00: # it was 20.0
                 print("no outlier in {}th prediction".format(j))
                 test_arbitary = test_arbitary +1
@@ -268,8 +270,8 @@ if __name__ == '__main__':
     folder = "/Users/zinatsayeeda/anaconda3/envs/rdkit/dataset/"
     #trainingSetFile = "/Users/zinatsayeeda/anaconda3/envs/rdkit/whole_training_nmr_1063_instance.csv"
     #trainingSetFile = "/Users/zinatsayeeda/anaconda3/envs/rdkit/whole_training_nmr_3000_plus_instance.csv"
-    trainingSetFile = "/Users/zinatsayeeda/anaconda3/envs/rdkit/training_nmr_1st_priority.csv"
-    #trainingSetFile = "/Users/zinatsayeeda/anaconda3/envs/rdkit/training_nmr_1st_2nd_priority_megred.csv"
+    #trainingSetFile = "/Users/zinatsayeeda/anaconda3/envs/rdkit/training_nmr_1st_priority.csv"
+    trainingSetFile = "/Users/zinatsayeeda/anaconda3/envs/rdkit/training_nmr_1st_2nd_priority_megred.csv"
     #testData = "/Users/zinatsayeeda/anaconda3/envs/rdkit/whole_test_nmr.csv"
     testData = "/Users/zinatsayeeda/anaconda3/envs/rdkit/holdout_nmr.csv"
     print("Start")

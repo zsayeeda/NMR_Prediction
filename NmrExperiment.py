@@ -13,6 +13,7 @@ from sklearn.preprocessing import LabelEncoder
 from sklearn.metrics import roc_curve, auc
 import pickle
 from sklearn.metrics import mean_absolute_error
+from sklearn.model_selection import cross_val_predict, cross_val_score, GridSearchCV
 
 
 class NmrExperiment:
@@ -23,8 +24,8 @@ class NmrExperiment:
         folder = "/Users/zinatsayeeda/anaconda3/envs/rdkit/dataset/"
         test_folder = "/Users/zinatsayeeda/anaconda3/envs/rdkit/test/"
         #trainingSetFile = "/Users/zinatsayeeda/anaconda3/envs/rdkit/whole_training_nmr_1063_instance.csv" # used only those descriptors I have generated using CDK
-        trainingSetFile = "/Users/zinatsayeeda/anaconda3/envs/rdkit/training_nmr_1st_priority.csv" # used only those descriptors I have generated using CDK
-        #trainingSetFile = "/Users/zinatsayeeda/anaconda3/envs/rdkit/training_nmr_1st_2nd_priority_megred.csv" # used only those descriptors I have generated using CDK
+        #trainingSetFile = "/Users/zinatsayeeda/anaconda3/envs/rdkit/training_nmr_1st_priority.csv" # used only those descriptors I have generated using CDK
+        trainingSetFile = "/Users/zinatsayeeda/anaconda3/envs/rdkit/training_nmr_1st_2nd_priority_megred.csv" # used only those descriptors I have generated using CDK
         #trainingSetFile = "/Users/zinatsayeeda/anaconda3/envs/rdkit/whole_training_nmr_3000_plus_instance.csv" # used only those descriptors I have generated using CDK
         # try:
         #     Instances isTrainingSet = (Instances) weka.core.SerializationHelper.read("models/train_classification_6") # fix it
@@ -132,8 +133,23 @@ class NmrExperiment:
         Y = factor[0]
         definitions = factor[1]
         reversefactor = dict(zip(range(len(factor[0])),definitions))
+        print("reverse factor looks like:{}".format(reversefactor))
         Y = Y.reshape(Y.shape[0],1)
         print("after factorization  Y data is :{} and shape is {}".format(Y,Y.shape))
+
+        #### grid searcg start ####
+        print("\n####grid search started ######\n\n")
+        gsc = GridSearchCV(estimator=RandomForestClassifier(),param_grid={'max_depth': range(3,10),'n_estimators': (10, 50, 100, 500, 1000),},cv=5, scoring='neg_mean_absolute_error', verbose=0,n_jobs=-1)
+        grid_result = gsc.fit(X, Y)
+        print("gsc done")
+        best_params = grid_result.best_params_
+        print("best_params={}".format(best_params))
+        print("\n####grid search ends ######\n\n")
+
+        #### grid search end ###
+
+
+
         cv = StratifiedKFold(n_splits=folds, random_state=123, shuffle=True)
         fprs, tprs, scores = [], [], []
         model = RandomForestClassifier()
@@ -308,6 +324,10 @@ class NmrExperiment:
         dataset = pd.read_csv(trainingSetFile , header = None)
         print("This is how the dataset looks like after converting to np array:{}".format(dataset))
     #    X = dataset[1:,1:-1]
+        hmdb_ids = dataset.iloc[1:,-2].values # it was -1 before for xuan's dataset
+        hmdb_ids = hmdb_ids.reshape(hmdb_ids.shape[0],1)
+        hydrogen_positions = dataset.iloc[1:,-1].values
+        hydrogen_positions = hydrogen_positions.reshape(hydrogen_positions.shape[0],1)
         X = dataset.iloc[1: , 0:-3].values #it was 0:-1 before]
         X = X.astype(float)
         print("X portion of dataset:{}".format(X))
@@ -342,6 +362,10 @@ class NmrExperiment:
             #print(" X_train is:{} and shape is:{}\n X_test is:{} and shape is:{}".format(X_train,X_train.shape,X_test,X_test.shape))
             y_train, y_test = Y[train_index], Y[test_index] # y_test is the true value of prediction
             #print(" y_train is:{} and shape is:{}\n y_test is:{} and shape is:{}".format(y_train,y_train.shape,y_test,y_test.shape))
+            hmdb_ids_in_each_fold_train = hmdb_ids[train_index]
+            hmdb_ids_in_each_fold_test = hmdb_ids[test_index]
+            hydrogen_positions_in_each_fold_train = hydrogen_positions[train_index]
+            hydrogen_positions_in_each_fold_test = hydrogen_positions[test_index]
             model.fit(X_train, y_train)
             y_pred = model.predict(X_test)
             #print(" y_pred is:{} and shape:{}".format(y_pred,y_pred.shape))
@@ -366,13 +390,13 @@ class NmrExperiment:
             print("Mean Absolute Error from fold:{} is:{}".format(i,meanAbsError))
             for j in range(len(y_pred)):
                 #print("in fold {} y_true = {} and y_pred ={}".format(i,y_test[j],y_pred[j]))
-                if ((abs(y_pred[j] - y_test[j]) < 0.04)): # it was 20.0. don't know whether that was correct
+                if ((abs(y_pred[j] - y_test[j]) < 8.0)): # it was 20.0. don't know whether that was correct
     ##            if ( (abs(round(y_pred[j],3) - round(y_test[j],3)) < 20)):
                     #print("no outlier in {}th prediction".format(j))
                     test_arbitary = test_arbitary +1
                 else:
                     outlier_num = outlier_num + 1
-                    print("true values of the outlier:{} and predicted value of the outlier is:{}".format(y_test[j],y_pred[j]))
+                    print("true values of the outlier:{} and predicted value of the outlier is:{}, HMDB ID is{} and H position is:{}".format(y_test[j],y_pred[j],hmdb_ids_in_each_fold_test[j],hydrogen_positions_in_each_fold_test[j]))
                     #print("HMDB ID of the outlier is:{}".format(hmdb_ids[outlier_index]))
                 error = abs(y_pred[j] - y_test[j]) + error
                 outlier_index = outlier_index + 1
