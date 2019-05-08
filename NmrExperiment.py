@@ -20,6 +20,7 @@ class NmrExperiment:
     #  This constructor function runs experiment on a training set doing 10-fold cross validation
     #    * measuring CV accuracy and validating the model
     saved_model = []
+    best_param = None
     def __init__(self, dataset): # if dataset = True run classifier with CDK will be executed
         folder = "/Users/zinatsayeeda/anaconda3/envs/rdkit/dataset/"
         test_folder = "/Users/zinatsayeeda/anaconda3/envs/rdkit/test/"
@@ -136,17 +137,6 @@ class NmrExperiment:
         print("reverse factor looks like:{}".format(reversefactor))
         Y = Y.reshape(Y.shape[0],1)
         print("after factorization  Y data is :{} and shape is {}".format(Y,Y.shape))
-
-        #### grid searcg start ####
-        print("\n####grid search started ######\n\n")
-        gsc = GridSearchCV(estimator=RandomForestClassifier(),param_grid={'max_depth': range(3,10),'n_estimators': (10, 50, 100, 500, 1000),},cv=5, scoring='neg_mean_absolute_error', verbose=0,n_jobs=-1)
-        grid_result = gsc.fit(X, Y)
-        print("gsc done")
-        best_params = grid_result.best_params_
-        print("best_params={}".format(best_params))
-        print("\n####grid search ends ######\n\n")
-
-        #### grid search end ###
 
 
 
@@ -351,8 +341,45 @@ class NmrExperiment:
         Y = Y.astype(int)
     ##    print("after factorization  Y data is :{} and shape is {}".format(Y,Y.shape))
         print("after converting to class label  Y data is :{} and shape is {}".format(Y,Y.shape))
-        cv = StratifiedKFold(n_splits=folds, random_state=123, shuffle=True)
+
+        '''
+        #### grid searcg start #### ignore it for now
+        print("####grid search started ######")
+        Y_temp = Y
+        gsc = GridSearchCV(estimator=RandomForestClassifier(),param_grid={'max_depth': range(3,10),'n_estimators': (10, 50, 100, 500, 1000),},cv=5, scoring='neg_mean_absolute_error', verbose=0,n_jobs=-1)
+        grid_result = gsc.fit(X, Y_temp.ravel())
+        print("gsc done")
+        best_params = grid_result.best_params_
+        self.best_param = best_params
+        print("best_params={}".format(self.best_param))
+        #p_result_from_gsc = grid_result.predict(X)
+        #print("gsc predicted result:{} and type:{}".format(p_result_from_gsc,type(p_result_from_gsc)))
+        cv_results = grid_result.cv_results_.keys()
+        print("gsc cv results keys:{}".format(cv_results))
+        print("gsc cv results :{}".format(grid_result.cv_results_))
+        print("split0_train_score:{}         split0_test_score:{}".format(cv_results['split0_train_score'],cv_results['split0_test_score']))
+        print("split1_train_score:{}         split1_test_score:{}".format(cv_results['split1_train_score'],cv_results['split1_test_score']))
+        print("split2_train_score:{}         split2_test_score:{}".format(cv_results['split2_train_score'],cv_results['split2_test_score']))
+        print("split3_train_score:{}         split3_test_score:{}".format(cv_results['split3_train_score'],cv_results['split3_test_score']))
+        print("split4_train_score:{}         split4_test_score:{}".format(cv_results['split4_train_score'],cv_results['split4_test_score']))
+        print("std_train_score:{}         std_test_score:{}".format(cv_results['std_train_score'],cv_results['std_test_score']))
+        print("mean_train_score:{}         mean_test_score:{}".format(cv_results['mean_train_score'],cv_results['mean_test_score']))
+        print("param_max_depth:{}         param_n_estimators:{}".format(cv_results['param_max_depth'],cv_results['param_n_estimators']))
+        print("params:{}         rank_test_score:{}".format(cv_results['params'],cv_results['rank_test_score']))
+        print("####grid search ends ######")
+
+        #### grid search end ###
+        '''
+
+
+
+
+
+
+        #cv = StratifiedKFold(n_splits=folds, random_state=123, shuffle=True)
+        cv = StratifiedKFold(n_splits=folds, random_state=None, shuffle=False)
         fprs, tprs, scores = [], [], []
+        #model = RandomForestClassifier(max_depth=self.best_param["max_depth"], n_estimators=self.best_param["n_estimators"])
         model = RandomForestClassifier()
         average_error = 0
         outlier_index = 0

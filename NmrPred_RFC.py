@@ -146,6 +146,7 @@ def runPredictionWithCDK(trainingSetFile, testData):
     #    model_saved_in_train_phase = exp.saved_model[0]
     #    model = model_saved_in_train_phase["model"]
     ##### fit the model with training set. no need for cross validation #########
+        #model = RandomForestClassifier(max_depth=exp.best_param["max_depth"], n_estimators=exp.best_param["n_estimators"])
         model = RandomForestClassifier()
         dataset_training = pd.read_csv(trainingSetFile , header = None)
         print("training data read and dataset_training:{}".format(dataset_training))
