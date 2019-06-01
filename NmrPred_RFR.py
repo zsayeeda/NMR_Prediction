@@ -102,24 +102,31 @@ def runPredictionWithCDK(trainingSetFile, testData):
         X_training = dataset_training.iloc[1: , 0:-3].values # it was -1 before
         X_training = X_training.astype(float)
         y_training = dataset_training.iloc[1:,-3].values # it was -1 before
+        y_training = y_training.reshape(y_training.shape[0],1)
         y_training = y_training.astype(float)
-        y_training = [round(i,3) for i in y_training]
-        y_training = np.asarray(y_training)
+        #y_training = [round(i,3) for i in y_training] # uncommit when u don't want to use ClassLabel
+        #y_training = np.asarray(y_training)# uncommit when u don't want to use ClassLabel
         #y_training = y_training.reshape(y_training.shape[0],1)
-        y_training = y_training.ravel()
+        #y_training = y_training.ravel() # uncommit when u don't want to use ClassLabel
         print("shape of X_training:{} and shape of y_training:{}".format(X_training.shape,y_training.shape))
         print("Xtraining:{} and y_training:{}".format(X_training,y_training))
 
-
+        '''
         # Perform Grid-Search
-        gsc = GridSearchCV(estimator=RandomForestRegressor(),param_grid={'max_depth': range(3,7),'n_estimators': (10, 50, 100, 1000),},cv=5, scoring='neg_mean_squared_error', verbose=0,n_jobs=-1)
+        gsc = GridSearchCV(estimator=RandomForestRegressor(),param_grid={'max_depth': range(3,7),'n_estimators': (10, 50, 100, 1000),},cv=5, scoring='neg_mean_absolute_error', verbose=0,n_jobs=-1)
         grid_result = gsc.fit(X_training, y_training)
         print("gsc done")
         best_params = grid_result.best_params_
         print("best_params={}".format(best_params))
-
-        rfr = RandomForestRegressor(max_depth=best_params["max_depth"], n_estimators=best_params["n_estimators"],random_state=False, verbose=False)
-        rfr.fit(X_train, y_train)
+        # grid search end
+        '''
+        Y_training = exp.classLabel(y_training)
+        print("Y_training after classLabel:{}".format(Y_training))
+        Y_training = Y_training.reshape(Y_training.shape[0],1)
+        Y_training = Y_training.astype(int)
+        #rfr = RandomForestRegressor(max_depth=exp.best_params["max_depth"], n_estimators=exp.best_params["n_estimators"],random_state=False, verbose=False)
+        rfr = RandomForestRegressor()
+        rfr.fit(X_training, Y_training)
         
     ##    y_training = y_training/100
     ##    print("before factorization  y_training data is :{} and shape is {}".format(y_training,y_training.shape))
@@ -143,15 +150,25 @@ def runPredictionWithCDK(trainingSetFile, testData):
         print("This is how the dataset looks like after converting to np array:{}".format(dataset))
         hmdb_ids = dataset.iloc[1:,-2].values # it was -1 before for xuan's dataset
         hmdb_ids = hmdb_ids.reshape(hmdb_ids.shape[0],1)
+        hydrogen_positions = dataset.iloc[1:,-1].values
+        hydrogen_positions = hydrogen_positions.reshape(hydrogen_positions.shape[0],1)
         X = dataset.iloc[1: , 0:-3].values # it was -2 before for xuan's dataset
         X = X.astype(float)
         print("X portion of dataset:{}".format(X))
         y =  dataset.iloc[1:,-3].values # it was -1 before for xuan's dataset
+        y = y.reshape(y.shape[0],1)
         y = y.astype(float)
-        y = [round(i,2) for i in y]
-        y = np.asarray(y)
+
+
+        #y = [round(i,2) for i in y] #umcommit when you don't use ClassLabel
+        #y = np.asarray(y)#umcommit when you don't use ClassLabel
         #Y = y.reshape(y.shape[0],1)
-        Y = y.ravel()
+        #Y = y.ravel()#umcommit when you don't use ClassLabel
+
+        Y = exp.classLabel(y)
+        print("Y after classLabel:{}".format(Y))
+        Y = Y.reshape(Y.shape[0],1)
+        Y = Y.astype(int)
         print("shape of X:{} and shape of Y:{}".format(X.shape,Y.shape))
         print("Xtraining:{} and y_training:{}".format(X,Y))
         
@@ -193,8 +210,9 @@ def runPredictionWithCDK(trainingSetFile, testData):
         X_test = X
         y_test = Y
         y_pred = rfr.predict(X_test)
-        y_pred = np.asarray(y_pred)
-        y_pred = y_pred.reshape(y_pred.shap[0],1)
+
+        #y_pred = np.asarray(y_pred) #uncommit if you use Class Label
+        #y_pred = y_pred.reshape(y_pred.shap[0],1)#uncommit if you use Class Label
         print("Prediction phase passed successfully")
         print("Prediction result is:{}".format(y_pred))
         print("True result is:{}".format(y_test))
@@ -208,19 +226,27 @@ def runPredictionWithCDK(trainingSetFile, testData):
     ##    y_test = np.vectorize(reversefactor.get)(y_test)
     ##    print("y_test after factorzation is:{}".format(y_test))
     #    y_test = 10 * y_test
+
+        y_pred = y_pred.astype(float)
+        y_pred = y_pred/float(100)
+        y_pred = y_pred.reshape(y_pred.shape[0],1)
+
+        y_test = y_test.astype(float)
+        y_test = y_test/float(100)
+
         error = 0
         outlier_num = 0
         test_arbitary = 0
         for j in range(len(y_pred)):
-            print("Printing prediction:{}------true:{} and HMDB_ID:{}".format(y_pred[j],y_test[j],hmdb_ids[j]))
-            if abs(y_pred[j] - y_test[j]) <= 8.00: # it was 20.0
+            print("Printing prediction:{}------true:{}, HMDB_ID:{} and H position is:{}".format(round(y_pred[j],2), y_test[j],hmdb_ids[j],hydrogen_positions[j]))
+            if abs(round(y_pred[j],2) - y_test[j]) <= 8.00: # it was 20.0
                 print("no outlier in {}th prediction".format(j))
                 test_arbitary = test_arbitary +1
             else:
                 outlier_num = outlier_num + 1
                 print("true values of the outlier:{}".format(y_test[j]))
                     #print("HMDB ID of the outlier is:{}".format(hmdb_ids[outlier_index]))
-            error = abs(y_pred[j] - y_test[j]) + error
+            error = abs(round(y_pred[j],2) - y_test[j]) + error
             outlier_index = outlier_index + 1
         error = error / len(y_pred)
         print("avg error in holdout test:{}".format(error))  
@@ -234,15 +260,15 @@ if __name__ == '__main__':
     folder = "/Users/zinatsayeeda/anaconda3/envs/rdkit/dataset/"
     #trainingSetFile = "/Users/zinatsayeeda/anaconda3/envs/rdkit/whole_training_nmr_1063_instance.csv"
     #trainingSetFile = "/Users/zinatsayeeda/anaconda3/envs/rdkit/whole_training_nmr_3000_plus_instance.csv"
-    trainingSetFile = "/Users/zinatsayeeda/anaconda3/envs/rdkit/training_nmr_1st_priority.csv"
-    #trainingSetFile = "/Users/zinatsayeeda/anaconda3/envs/rdkit/training_nmr_1st_2nd_priority_megred.csv"
+    #trainingSetFile = "/Users/zinatsayeeda/anaconda3/envs/rdkit/training_nmr_1st_priority.csv"
+    trainingSetFile = "/Users/zinatsayeeda/anaconda3/envs/rdkit/training_nmr_1st_2nd_priority_megred.csv"
     #testData = "/Users/zinatsayeeda/anaconda3/envs/rdkit/whole_test_nmr.csv"
     testData = "/Users/zinatsayeeda/anaconda3/envs/rdkit/holdout_nmr.csv"
     print("Start")
     print("Start with:{}".format(sys.argv[1]))
     exp = NmrExp.NmrExperiment(sys.argv[1])
     #runPrediction(folder);
-    #runPredictionWithCDK(trainingSetFile,testData)
+    runPredictionWithCDK(trainingSetFile,testData)
     print("End")
 
 

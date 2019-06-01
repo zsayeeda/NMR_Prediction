@@ -26,7 +26,8 @@ class NmrExperiment:
         test_folder = "/Users/zinatsayeeda/anaconda3/envs/rdkit/test/"
         #trainingSetFile = "/Users/zinatsayeeda/anaconda3/envs/rdkit/whole_training_nmr_1063_instance.csv" # used only those descriptors I have generated using CDK
         #trainingSetFile = "/Users/zinatsayeeda/anaconda3/envs/rdkit/training_nmr_1st_priority.csv" # used only those descriptors I have generated using CDK
-        trainingSetFile = "/Users/zinatsayeeda/anaconda3/envs/rdkit/training_nmr_1st_2nd_priority_megred.csv" # used only those descriptors I have generated using CDK
+        #trainingSetFile = "/Users/zinatsayeeda/anaconda3/envs/rdkit/training_nmr_1st_2nd_priority_megred.csv" # used only those descriptors I have generated using CDK
+        trainingSetFile = "/Users/zinatsayeeda/anaconda3/envs/rdkit/training_nmr_1st_2nd_priority_megred_2.csv"
         #trainingSetFile = "/Users/zinatsayeeda/anaconda3/envs/rdkit/whole_training_nmr_3000_plus_instance.csv" # used only those descriptors I have generated using CDK
         # try:
         #     Instances isTrainingSet = (Instances) weka.core.SerializationHelper.read("models/train_classification_6") # fix it
@@ -417,15 +418,15 @@ class NmrExperiment:
             print("Mean Absolute Error from fold:{} is:{}".format(i,meanAbsError))
             for j in range(len(y_pred)):
                 #print("in fold {} y_true = {} and y_pred ={}".format(i,y_test[j],y_pred[j]))
-                if ((abs(y_pred[j] - y_test[j]) < 8.0)): # it was 20.0. don't know whether that was correct
+                if ((abs(round(y_pred[j],2) - y_test[j]) < 8.0)): # it was 20.0. don't know whether that was correct
     ##            if ( (abs(round(y_pred[j],3) - round(y_test[j],3)) < 20)):
                     #print("no outlier in {}th prediction".format(j))
                     test_arbitary = test_arbitary +1
                 else:
                     outlier_num = outlier_num + 1
-                    print("true values of the outlier:{} and predicted value of the outlier is:{}, HMDB ID is{} and H position is:{}".format(y_test[j],y_pred[j],hmdb_ids_in_each_fold_test[j],hydrogen_positions_in_each_fold_test[j]))
+                    print("true values of the outlier:{} and predicted value of the outlier is:{}, HMDB ID is{} and H position is:{}".format(y_test[j],round(y_pred[j],2),hmdb_ids_in_each_fold_test[j],hydrogen_positions_in_each_fold_test[j]))
                     #print("HMDB ID of the outlier is:{}".format(hmdb_ids[outlier_index]))
-                error = abs(y_pred[j] - y_test[j]) + error
+                error = abs(round(y_pred[j],2) - y_test[j]) + error
                 outlier_index = outlier_index + 1
                 #print("In fold i:{} y_pred is:{}    and   y_test:{}".format(i,y_pred[j],y_test[j]))
 

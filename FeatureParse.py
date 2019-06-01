@@ -8,12 +8,13 @@ import operator
 import csv
 
 def main():
-  #file_path = "/Users/zinatsayeeda/anaconda3/envs/rdkit/test_1/log_out_2.txt"
+  file_path = "/Users/zinatsayeeda/anaconda3/envs/rdkit/test_1/log_out_2.txt"
   #file_path = "/Users/zinatsayeeda/anaconda3/envs/rdkit/test_3/log_out.txt"
-  file_path = "/Users/zinatsayeeda/anaconda3/envs/rdkit/dataset/dataset_1st_priority/log_out.txt" # change here the file name
+  #file_path = "/Users/zinatsayeeda/anaconda3/envs/rdkit/dataset/dataset_1st_priority/log_out.txt" # change here the file name
   #file_path = "/Users/zinatsayeeda/anaconda3/envs/rdkit/dataset/dataset_2nd_priority/log_out.txt"
   file_text = open(file_path).read()
   file_blocks = file_text.split("file entry in create structure:")
+  print("file blocks are:{}".format(file_blocks))
   dataset_array = []
   header = ["5YQ8","D6M9","SAR9","ZQ50","1OGV","UVGB","TWWV","FZUL","LDBJ","3O99","C0TG","U5NM","K03U","2FZG","68AK","O54T","XXYJ","ZT3G","KCS9","JV9V","L8O7","08W0","3O2D","QAID","OVCT","YAQ5","C77C","8K3B","HTZ9","G4N0","67JR","N8KG","9ZJ9","4CX3","NAD7","X3KZ","8YQA","TV2E","1B1U","XYFG","AN91","YPYO","OURC","I3T6","GASV","A9XG","35N1","YKSQ","3BMV","YKAQ","WOLC","TALS","Z7E2","VQP0","HPNW","EM8L","G3VD","R8H6","SBQX","GGQ4","ZE85","CPLP","DI39","7T6E","R7OH","6HUB","M1UL","75PM","2J0O","UX3R","CSIF","FXYO","LHG6","IX4T","MCGP","GCJI","1X82","RRH0","Y07Q","WY2M","HNZD","LBZF","LREX","IHWP","FZ2K","ZWGF","A0GN","2S89","RRNR","IUFK","OM9G","ZZ6G","N4PZ","1HI2","BOJ3","2HZR","LBDE","D9QV","VN0S","TQY0","6OP0","TR6T","CLHS","LY8T","3EVY","MK8O","1FO8","1CMK","CDQJ","LKU8","0MRV","UILJ","X9XK","XEQX","KOBD","3GTM","ChemicalShift","HMDBID","HPosition"]
   for i in range(1, len(file_blocks)): # iterate over each block
@@ -47,7 +48,7 @@ def main():
       descriptors_final_values.append(descriptors) 
     descriptors_final_values.pop(0)
     print("For block:{}, HMDB IDs:{}, H Positions:{} and Descriptor Values:{}".format(i, hmdb_id,hydrogen_position,descriptors_final_values))
-    chem_file_path = "/Users/zinatsayeeda/anaconda3/envs/rdkit/dataset/dataset_1st_priority/"+array_of_lines_in_each_block[0].split(".sdf")[0] #change the path here
+    chem_file_path = "/Users/zinatsayeeda/anaconda3/envs/rdkit/test_1/"+array_of_lines_in_each_block[0].split(".sdf")[0] #change the path here
     print("chem file path:{}".format(chem_file_path))
     H_position_and_chemicalshift_in_shift_file = ReadShiftFile1(chem_file_path,hydrogen_position)
     print("in chemical shift file{}".format(H_position_and_chemicalshift_in_shift_file))
@@ -57,8 +58,8 @@ def main():
         if  d["H_position"] == h_p:
           dataset_array.append({"descriptor": descriptors_final_values[i], "chemical_shift": d["chemical_shift"], "HMDB_ID": hmdb_id[0], "hydrogen_position": d["H_position"]})
   print("Final Dataset:{}".format(dataset_array))
-  #with open('/Users/zinatsayeeda/anaconda3/envs/rdkit/test_1/holdout_nmr.csv', 'w') as csv_file:
-  with open('/Users/zinatsayeeda/anaconda3/envs/rdkit/dataset/dataset_1st_priority/training_nmr_1st_priority.csv', 'w') as csv_file: #change path and file name here too
+  with open('/Users/zinatsayeeda/anaconda3/envs/rdkit/test_1/holdout_nmr_2.csv', 'w') as csv_file:
+  #with open('/Users/zinatsayeeda/anaconda3/envs/rdkit/dataset/dataset_1st_priority/training_nmr_1st_priority.csv', 'w') as csv_file: #change path and file name here too
     writer = csv.writer(csv_file)
     writer.writerow(header)
     for i in range(len(dataset_array)):
@@ -105,6 +106,7 @@ def ReadShiftFile(file_name):
 
 #use it for     
 def ReadShiftFile1(file_name, h_position):
+  print("h_position is:{} and length:{}".format(h_position,len(h_position)))
   H_position_and_chemicalshift_in_shift_file = [] # this returns after checking "O" and "N" as neighbor atoms
   hydrogen_positions_in_mol_file = []
   hydrogen = []
@@ -118,6 +120,7 @@ def ReadShiftFile1(file_name, h_position):
       print("S:{}".format(splited_line[len_of_splitted_line-1].strip()))
       hydrogen.append(int(splited_line[0].strip()))
       shift.append(float(splited_line[len_of_splitted_line-1].strip()))
+    print("hydrogen:{}, shif:{}".format(hydrogen, shift))
   for i in range(len(h_position)):
     if h_position[i] in hydrogen:
       index_of_hydrogen_array = hydrogen.index(h_position[i])

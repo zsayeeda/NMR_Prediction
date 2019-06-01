@@ -22,12 +22,13 @@ class NmrExperiment:
     #  This constructor function runs experiment on a training set doing 10-fold cross validation
     #    * measuring CV accuracy and validating the model
     saved_model = []
+    best_params = None
     def __init__(self, dataset): # if dataset = True run classifier with CDK will be executed
         folder = "/Users/zinatsayeeda/anaconda3/envs/rdkit/dataset/"
         test_folder = "/Users/zinatsayeeda/anaconda3/envs/rdkit/test/"
         #trainingSetFile = "/Users/zinatsayeeda/anaconda3/envs/rdkit/whole_training_nmr_1063_instance.csv" # used only those descriptors I have generated using CDK
-        trainingSetFile = "/Users/zinatsayeeda/anaconda3/envs/rdkit/training_nmr_1st_priority.csv" # used only those descriptors I have generated using CDK
-        #trainingSetFile = "/Users/zinatsayeeda/anaconda3/envs/rdkit/training_nmr_1st_2nd_priority_megred.csv" # used only those descriptors I have generated using CDK
+        #trainingSetFile = "/Users/zinatsayeeda/anaconda3/envs/rdkit/training_nmr_1st_priority.csv" # used only those descriptors I have generated using CDK
+        trainingSetFile = "/Users/zinatsayeeda/anaconda3/envs/rdkit/training_nmr_1st_2nd_priority_megred.csv" # used only those descriptors I have generated using CDK
         #trainingSetFile = "/Users/zinatsayeeda/anaconda3/envs/rdkit/whole_training_nmr_3000_plus_instance.csv" # used only those descriptors I have generated using CDK
         # try:
         #     Instances isTrainingSet = (Instances) weka.core.SerializationHelper.read("models/train_classification_6") # fix it
@@ -302,60 +303,85 @@ class NmrExperiment:
         print("#########    Random forest model train started ##############\n")
         dataset_training = pd.read_csv(trainingSetFile , header = None)
         print("training data read and dataset_training:{}".format(dataset_training))
+        hmdb_ids = dataset_training.iloc[1:,-2].values # it was -1 before for xuan's dataset
+        hmdb_ids = hmdb_ids.reshape(hmdb_ids.shape[0],1)
+        hydrogen_positions = dataset_training.iloc[1:,-1].values
+        hydrogen_positions = hydrogen_positions.reshape(hydrogen_positions.shape[0],1)
         X_training = dataset_training.iloc[1: , 0:-3].values # it was -1 before
         X_training = X_training.astype(float)
         y_training =  dataset_training.iloc[1:,-3].values # it was -1 before
         y_training = y_training.astype(float)
-        y_training = [round(i,3) for i in y_training]
-        y_training = np.asarray(y_training)
-        #y_training = y_training.reshape(y_training.shape[0],1)
-        y_training = y_training.ravel()
-        print("Inside NmrExp")
-        print("shape of X_training:{} and shape of y_training:{}".format(X_training.shape,y_training.shape))
-        print("Xtraining:{} and y_training:{}".format(X_training,y_training))
-
-        # Perform Grid-Search
-        gsc = GridSearchCV(estimator=RandomForestRegressor(),param_grid={'max_depth': range(3,7),'n_estimators': (10, 50, 100, 1000),},cv=5, scoring='neg_mean_squared_error', verbose=0,n_jobs=-1)
-        print("gsc done")
-        grid_result = gsc.fit(X_training, y_training)
-        print("grid result done")
-        best_params = grid_result.best_params_
-        print("best_params={}".format(best_params))
-        rfr = RandomForestRegressor(max_depth=best_params["max_depth"], n_estimators=best_params["n_estimators"],random_state=False, verbose=False)
-        folds = 10
-        #perform cross validation
-        cv = StratifiedKFold(n_splits=folds, random_state=123, shuffle=True)
-        average_error = 0
-        outlier_index = 0
+        #y_training = [round(i,2) for i in y_training] # uncommit when u don't want to use ClassLabel
         y_training = np.asarray(y_training)
         y_training = y_training.reshape(y_training.shape[0],1)
+        Y = self.classLabel(y_training) # del when u don't want to use ClassLabel
+        print("Y after classLabel:{}".format(Y)) # del when u don't want to use ClassLabel
+        Y = Y.reshape(Y.shape[0],1) # del when u don't want to use ClassLabel
+        Y = Y.astype(int) # del when u don't want to use ClassLabel
+        #y_training = y_training.reshape(y_training.shape[0],1)
+        #y_training = y_training.ravel()
+        print("Inside NmrExp")
+        print("shape of X_training:{} and shape of y_training:{}".format(X_training.shape,Y.shape))
+        print("Xtraining:{} and y_training:{}".format(X_training,Y))
+
+
+        '''
+        # Perform Grid-Search
+        gsc = GridSearchCV(estimator=RandomForestRegressor(),param_grid={'max_depth': range(3,7),'n_estimators': (10, 50, 100, 500, 1000),},cv=5, scoring='neg_mean_absolute_error', verbose=0,n_jobs=-1)
+        print("gsc done")
+        y_training_temp = y_training.ravel()
+        grid_result = gsc.fit(X_training, y_training_temp)
+        print("grid result done")
+        self.best_params = grid_result.best_params_
+        print("best_params={}".format(best_params))
+        #### grid search ends ####
+        '''
+
+        #rfr = RandomForestRegressor(max_depth=self.best_params["max_depth"], n_estimators=self.best_params["n_estimators"],random_state=False, verbose=False)
+        rfr = RandomForestRegressor()
+        folds = 10
+        #perform cross validation
+        cv = StratifiedKFold(n_splits=folds, random_state=None, shuffle=False)
+        average_error = 0
+        outlier_index = 0
+        #y_training = np.asarray(y_training)
+        #y_training = y_training.reshape(y_training.shape[0],1)
         print("\n\n########  cross validation started ##########")
-        for (train_index, test_index), i in zip(cv.split(X_training, y_training), range(folds)):
+        for (train_index, test_index), i in zip(cv.split(X_training, Y), range(folds)):
             print("inside the loop")
-            X_train, X_test = X[train_index], X[test_index]
+            X_train, X_test = X_training[train_index], X_training[test_index]
             y_train, y_test = Y[train_index], Y[test_index]
-            print("X_train:{},  X_test:{}, y_train:{}, y_test:{}".format(X_train,X_test,y_train,y_test))
+            hmdb_ids_in_each_fold_train = hmdb_ids[train_index]
+            hmdb_ids_in_each_fold_test = hmdb_ids[test_index]
+            hydrogen_positions_in_each_fold_train = hydrogen_positions[train_index]
+            hydrogen_positions_in_each_fold_test = hydrogen_positions[test_index]
+            rfr.fit(X_train, y_train)
+            #print("X_train:{},  X_test:{}, y_train:{}, y_test:{}".format(X_train,X_test,y_train,y_test))
             rfr.fit(X_train, y_train.ravel())
             y_pred = rfr.predict(X_test)
-            y_pred =  np.asarray(y_pred)
-            y_pred = y_pred.reshape(y_pred.shap[0],1)
+            y_pred = y_pred.astype(float)
+            y_pred = y_pred/float(100)
+            
+            y_test = y_test.astype(float)
+            y_test = y_test/float(100)
+
             error = 0
             outlier_num = 0
             test_arbitary = 0
             meanAbsError = mean_absolute_error(y_test, y_pred) # from sklearn
             print("Mean Absolute Error from fold:{} is:{}".format(i,meanAbsError))
             for j in range(len(y_pred)):
-                if ((abs(y_pred[j] - y_test[j]) <= 8.00)):
+                if ((abs(round(y_pred[j],2) - y_test[j]) <= 8.00)):
                     test_arbitary = test_arbitary +1
                 else:
                     outlier_num = outlier_num + 1
-                    print("true values of the outlier:{} and predicted value of the outlier is:{}".format(y_test[j],y_pred[j]))
-                error = abs(y_pred[j] - y_test[j]) + error
+                    print("true values of the outlier:{} and predicted value of the outlier is:{}, HMDB ID is{} and H position is:{}".format(y_test[j],round(y_pred[j],2),hmdb_ids_in_each_fold_test[j],hydrogen_positions_in_each_fold_test[j]))
+                error = abs(round(y_pred[j],2) - y_test[j]) + error
                 outlier_index = outlier_index + 1
             error = error / len(y_pred)
             print("avg error in {}th fold:{}".format(i,error))  
             print("total number of outliers in {} fold:{}".format(i,outlier_num))
-            self.saved_model.append({"error": error, "model": model})
+            #self.saved_model.append({"error": error, "model": model})
             average_error = error + average_error
         average_error = average_error/folds
         print("after all fold the average error:{}".format(average_error))

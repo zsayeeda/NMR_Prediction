@@ -250,14 +250,14 @@ def runPredictionWithCDK(trainingSetFile, testData):
         test_arbitary = 0
         for j in range(len(y_pred)):
             print("Printing prediction:{}------true:{}, HMDB_ID:{} and H position is:{}".format(y_pred[j], y_test[j],hmdb_ids[j],hydrogen_positions[j]))
-            if abs(y_pred[j] - y_test[j]) <= 8.00: # it was 20.0
+            if abs(round(y_pred[j],2) - y_test[j]) <= 8.00: # it was 20.0
                 print("no outlier in {}th prediction".format(j))
                 test_arbitary = test_arbitary +1
             else:
                 outlier_num = outlier_num + 1
                 print("true values of the outlier:{}".format(y_test[j]))
                     #print("HMDB ID of the outlier is:{}".format(hmdb_ids[outlier_index]))
-            error = abs(y_pred[j] - y_test[j]) + error
+            error = abs(round(y_pred[j],2) - y_test[j]) + error
             outlier_index = outlier_index + 1
         error = error / len(y_pred)
         print("avg error in holdout test:{}".format(error))  
@@ -272,9 +272,11 @@ if __name__ == '__main__':
     #trainingSetFile = "/Users/zinatsayeeda/anaconda3/envs/rdkit/whole_training_nmr_1063_instance.csv"
     #trainingSetFile = "/Users/zinatsayeeda/anaconda3/envs/rdkit/whole_training_nmr_3000_plus_instance.csv"
     #trainingSetFile = "/Users/zinatsayeeda/anaconda3/envs/rdkit/training_nmr_1st_priority.csv"
-    trainingSetFile = "/Users/zinatsayeeda/anaconda3/envs/rdkit/training_nmr_1st_2nd_priority_megred.csv"
+    #trainingSetFile = "/Users/zinatsayeeda/anaconda3/envs/rdkit/training_nmr_1st_2nd_priority_megred.csv"
+    trainingSetFile = "/Users/zinatsayeeda/anaconda3/envs/rdkit/training_nmr_1st_2nd_priority_megred_2.csv"
     #testData = "/Users/zinatsayeeda/anaconda3/envs/rdkit/whole_test_nmr.csv"
-    testData = "/Users/zinatsayeeda/anaconda3/envs/rdkit/holdout_nmr.csv"
+    #testData = "/Users/zinatsayeeda/anaconda3/envs/rdkit/holdout_nmr.csv"
+    testData = "/Users/zinatsayeeda/anaconda3/envs/rdkit/holdout_nmr_2.csv"
     print("Start")
     print("Start with:{}".format(sys.argv[1]))
     exp = NmrExp.NmrExperiment(sys.argv[1])
