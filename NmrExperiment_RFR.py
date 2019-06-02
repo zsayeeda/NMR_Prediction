@@ -325,7 +325,7 @@ class NmrExperiment:
         print("Xtraining:{} and y_training:{}".format(X_training,Y))
 
 
-        '''
+        
         # Perform Grid-Search
         gsc = GridSearchCV(estimator=RandomForestRegressor(),param_grid={'max_depth': range(3,7),'n_estimators': (10, 50, 100, 500, 1000),},cv=5, scoring='neg_mean_absolute_error', verbose=0,n_jobs=-1)
         print("gsc done")
@@ -333,9 +333,9 @@ class NmrExperiment:
         grid_result = gsc.fit(X_training, y_training_temp)
         print("grid result done")
         self.best_params = grid_result.best_params_
-        print("best_params={}".format(best_params))
+        print("best_params={}".format(self.best_params))
         #### grid search ends ####
-        '''
+        
 
         #rfr = RandomForestRegressor(max_depth=self.best_params["max_depth"], n_estimators=self.best_params["n_estimators"],random_state=False, verbose=False)
         rfr = RandomForestRegressor()

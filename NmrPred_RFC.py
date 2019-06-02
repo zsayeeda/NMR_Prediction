@@ -272,11 +272,11 @@ if __name__ == '__main__':
     #trainingSetFile = "/Users/zinatsayeeda/anaconda3/envs/rdkit/whole_training_nmr_1063_instance.csv"
     #trainingSetFile = "/Users/zinatsayeeda/anaconda3/envs/rdkit/whole_training_nmr_3000_plus_instance.csv"
     #trainingSetFile = "/Users/zinatsayeeda/anaconda3/envs/rdkit/training_nmr_1st_priority.csv"
-    #trainingSetFile = "/Users/zinatsayeeda/anaconda3/envs/rdkit/training_nmr_1st_2nd_priority_megred.csv"
-    trainingSetFile = "/Users/zinatsayeeda/anaconda3/envs/rdkit/training_nmr_1st_2nd_priority_megred_2.csv"
+    trainingSetFile = "/Users/zinatsayeeda/anaconda3/envs/rdkit/training_nmr_1st_2nd_priority_megred.csv"
+    #trainingSetFile = "/Users/zinatsayeeda/anaconda3/envs/rdkit/training_nmr_1st_2nd_priority_megred_2.csv"
     #testData = "/Users/zinatsayeeda/anaconda3/envs/rdkit/whole_test_nmr.csv"
-    #testData = "/Users/zinatsayeeda/anaconda3/envs/rdkit/holdout_nmr.csv"
-    testData = "/Users/zinatsayeeda/anaconda3/envs/rdkit/holdout_nmr_2.csv"
+    testData = "/Users/zinatsayeeda/anaconda3/envs/rdkit/holdout_nmr.csv"
+    #testData = "/Users/zinatsayeeda/anaconda3/envs/rdkit/holdout_nmr_2.csv"
     print("Start")
     print("Start with:{}".format(sys.argv[1]))
     exp = NmrExp.NmrExperiment(sys.argv[1])

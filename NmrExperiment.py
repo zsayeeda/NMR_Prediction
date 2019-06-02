@@ -26,8 +26,8 @@ class NmrExperiment:
         test_folder = "/Users/zinatsayeeda/anaconda3/envs/rdkit/test/"
         #trainingSetFile = "/Users/zinatsayeeda/anaconda3/envs/rdkit/whole_training_nmr_1063_instance.csv" # used only those descriptors I have generated using CDK
         #trainingSetFile = "/Users/zinatsayeeda/anaconda3/envs/rdkit/training_nmr_1st_priority.csv" # used only those descriptors I have generated using CDK
-        #trainingSetFile = "/Users/zinatsayeeda/anaconda3/envs/rdkit/training_nmr_1st_2nd_priority_megred.csv" # used only those descriptors I have generated using CDK
-        trainingSetFile = "/Users/zinatsayeeda/anaconda3/envs/rdkit/training_nmr_1st_2nd_priority_megred_2.csv"
+        trainingSetFile = "/Users/zinatsayeeda/anaconda3/envs/rdkit/training_nmr_1st_2nd_priority_megred.csv" # used only those descriptors I have generated using CDK
+        #trainingSetFile = "/Users/zinatsayeeda/anaconda3/envs/rdkit/training_nmr_1st_2nd_priority_megred_2.csv"
         #trainingSetFile = "/Users/zinatsayeeda/anaconda3/envs/rdkit/whole_training_nmr_3000_plus_instance.csv" # used only those descriptors I have generated using CDK
         # try:
         #     Instances isTrainingSet = (Instances) weka.core.SerializationHelper.read("models/train_classification_6") # fix it

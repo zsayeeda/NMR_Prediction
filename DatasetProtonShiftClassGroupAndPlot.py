@@ -19,9 +19,14 @@ def DatasetProtonShiftClassGroupAndPlot():
   dataset_file = pd.read_csv("/Users/zinatsayeeda/anaconda3/envs/rdkit/dataset/dataset_1st_2nd_priority_csv/molecule_shift_class_merge.csv" , header = None)
   data_for_graph = pd.read_csv("/Users/zinatsayeeda/anaconda3/envs/rdkit/dataset/dataset_1st_2nd_priority_csv/molecule_shift_class_merge.csv" , sep=',')
   #print(" data is read and dataset file is:{}".format(dataset_file))
-  y_data =  dataset_file.iloc[:,-2].values
+  y_data =  dataset_file.iloc[:,-2].values # this is the chemical shift values
   y_data = np.array(y_data)
-  x_label= np.array(np.unique(y_data, return_counts=True)).T
+  hmdb_ids =  dataset_file.iloc[:,-3].values # this is the chemical shift values
+  hmdb_ids = np.array(hmdb_ids)
+  group =  dataset_file.iloc[:,-1].values # this is the chemical group values
+  group = np.array(group)
+  print("group:{}".format(group))
+  x_label= np.array(np.unique(y_data, return_counts=True)).T # x_label returns uniq values in the dataset depending on what u are looking for as uniq set
   print("uniq classes:{} and length:{}".format(x_label, len(x_label)))
   sns.set(font_scale=0.5)
   countplt=sns.countplot(x='CHEMICAL_SHIFT_CLASS', data=data_for_graph, palette ='hls')
@@ -30,6 +35,28 @@ def DatasetProtonShiftClassGroupAndPlot():
   plt.ylabel('Frequency', fontsize=16)
   #sns.scatterplot(x='GROUP', y='HMDB_ID',hue='CHEMICAL_SHIFT_CLASS',data=data_for_graph)
   plt.show()
+
+  ##### this part is to take the HMDBID for uniq chemical shift values####
+  dataset_array =[]
+  for i in range(len(x_label)):
+    hm_id =[]
+    chemical_group =[]
+    for j in range(len(y_data)):
+      if x_label[i][0] == y_data[j]:
+        hm_id.append(hmdb_ids[j])
+        chemical_group.append(group[j])
+    dataset_array.append({"chemical_shift_class":x_label[i][0], "HMDB_IDS": hm_id,"klass": chemical_group})
+  with open('/Users/zinatsayeeda/anaconda3/envs/rdkit/dataset/dataset_1st_2nd_priority_csv/shiftclass_id_group.csv', 'w') as csv_file: #change path and file name here too
+    writer = csv.writer(csv_file)
+    for i in range(len(dataset_array)):
+      data_row = []
+      data_row.append(dataset_array[i]["chemical_shift_class"])
+      data_row.append(dataset_array[i]["HMDB_IDS"])
+      data_row.append(dataset_array[i]["klass"])
+      writer.writerow(data_row)
+
+
+
 
 
 
