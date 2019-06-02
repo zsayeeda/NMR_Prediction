@@ -45,7 +45,12 @@ def DatasetProtonShiftClassGroupAndPlot():
       if x_label[i][0] == y_data[j]:
         hm_id.append(hmdb_ids[j])
         chemical_group.append(group[j])
-    dataset_array.append({"chemical_shift_class":x_label[i][0], "HMDB_IDS": hm_id,"klass": chemical_group})
+    total_number_of_compounds = len(np.array(np.unique(hm_id, return_counts=True)).T)
+    total_number_of_protons = len(hm_id)
+    print("total_number_of_compounds:{}".format(total_number_of_compounds))
+    total_number_of_uniq_chem_group = len(np.array(np.unique(chemical_group, return_counts=True)).T)
+    print("total_number_of_uniq_group:{}".format(total_number_of_uniq_chem_group))
+    dataset_array.append({"chemical_shift_class":x_label[i][0], "HMDB_IDS": hm_id,"klass": chemical_group, "Total_compound": total_number_of_compounds, "total_number_of_protons": total_number_of_protons, "number_of_uniq_chem_group": total_number_of_uniq_chem_group})
   with open('/Users/zinatsayeeda/anaconda3/envs/rdkit/dataset/dataset_1st_2nd_priority_csv/shiftclass_id_group.csv', 'w') as csv_file: #change path and file name here too
     writer = csv.writer(csv_file)
     for i in range(len(dataset_array)):
@@ -53,6 +58,9 @@ def DatasetProtonShiftClassGroupAndPlot():
       data_row.append(dataset_array[i]["chemical_shift_class"])
       data_row.append(dataset_array[i]["HMDB_IDS"])
       data_row.append(dataset_array[i]["klass"])
+      data_row.append(dataset_array[i]["Total_compound"])
+      data_row.append(dataset_array[i]["total_number_of_protons"])
+      data_row.append(dataset_array[i]["number_of_uniq_chem_group"])
       writer.writerow(data_row)
 
 
