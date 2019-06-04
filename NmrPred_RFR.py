@@ -120,6 +120,7 @@ def runPredictionWithCDK(trainingSetFile, testData):
         print("best_params={}".format(best_params))
         # grid search end
         '''
+        
         Y_training = exp.classLabel(y_training)
         print("Y_training after classLabel:{}".format(Y_training))
         Y_training = Y_training.reshape(Y_training.shape[0],1)
@@ -261,9 +262,11 @@ if __name__ == '__main__':
     #trainingSetFile = "/Users/zinatsayeeda/anaconda3/envs/rdkit/whole_training_nmr_1063_instance.csv"
     #trainingSetFile = "/Users/zinatsayeeda/anaconda3/envs/rdkit/whole_training_nmr_3000_plus_instance.csv"
     #trainingSetFile = "/Users/zinatsayeeda/anaconda3/envs/rdkit/training_nmr_1st_priority.csv"
-    trainingSetFile = "/Users/zinatsayeeda/anaconda3/envs/rdkit/training_nmr_1st_2nd_priority_megred.csv"
+    #trainingSetFile = "/Users/zinatsayeeda/anaconda3/envs/rdkit/training_nmr_1st_2nd_priority_megred.csv"
+    trainingSetFile = "/Users/zinatsayeeda/anaconda3/envs/rdkit/training_nmr_1st_2nd_priority_without_2D.csv"
     #testData = "/Users/zinatsayeeda/anaconda3/envs/rdkit/whole_test_nmr.csv"
-    testData = "/Users/zinatsayeeda/anaconda3/envs/rdkit/holdout_nmr.csv"
+    #testData = "/Users/zinatsayeeda/anaconda3/envs/rdkit/holdout_nmr.csv"
+    testData = "/Users/zinatsayeeda/anaconda3/envs/rdkit/holdout_nmr_test4.csv"
     print("Start")
     print("Start with:{}".format(sys.argv[1]))
     exp = NmrExp.NmrExperiment(sys.argv[1])

@@ -28,7 +28,8 @@ class NmrExperiment:
         test_folder = "/Users/zinatsayeeda/anaconda3/envs/rdkit/test/"
         #trainingSetFile = "/Users/zinatsayeeda/anaconda3/envs/rdkit/whole_training_nmr_1063_instance.csv" # used only those descriptors I have generated using CDK
         #trainingSetFile = "/Users/zinatsayeeda/anaconda3/envs/rdkit/training_nmr_1st_priority.csv" # used only those descriptors I have generated using CDK
-        trainingSetFile = "/Users/zinatsayeeda/anaconda3/envs/rdkit/training_nmr_1st_2nd_priority_megred.csv" # used only those descriptors I have generated using CDK
+        #trainingSetFile = "/Users/zinatsayeeda/anaconda3/envs/rdkit/training_nmr_1st_2nd_priority_megred.csv" # used only those descriptors I have generated using CDK
+        trainingSetFile = "/Users/zinatsayeeda/anaconda3/envs/rdkit/training_nmr_1st_2nd_priority_without_2D.csv" # used only those descriptors I have generated using CDK
         #trainingSetFile = "/Users/zinatsayeeda/anaconda3/envs/rdkit/whole_training_nmr_3000_plus_instance.csv" # used only those descriptors I have generated using CDK
         # try:
         #     Instances isTrainingSet = (Instances) weka.core.SerializationHelper.read("models/train_classification_6") # fix it
@@ -333,13 +334,14 @@ class NmrExperiment:
         grid_result = gsc.fit(X_training, y_training_temp)
         print("grid result done")
         self.best_params = grid_result.best_params_
-        print("best_params={}".format(best_params))
+        print("best_params={}".format(self.best_params))
         #### grid search ends ####
         '''
+        
 
         #rfr = RandomForestRegressor(max_depth=self.best_params["max_depth"], n_estimators=self.best_params["n_estimators"],random_state=False, verbose=False)
         rfr = RandomForestRegressor()
-        folds = 10
+        folds = 5
         #perform cross validation
         cv = StratifiedKFold(n_splits=folds, random_state=None, shuffle=False)
         average_error = 0
