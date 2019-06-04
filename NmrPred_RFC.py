@@ -106,19 +106,21 @@ def runPrediction(folder):
         average_error = 0
         outlier_index = 0
 
-
+        ''
         # implementation of PCA #####
+        threshold = 10**-3
         sd = np.std(X, axis =0) 
         X_new = X[:,sd >= threshold]
         pca = PCA(n_components= X_new.shape[1])
         pca.fit(X_new)
         pca = PCA(n_components=21)
         pca.fit(X_new)
-        X1=pca.fit_transform(X) # X1 is the new dataset now
+        X1=pca.fit_transform(X_new) # X1 is the new dataset now
         #### implementation of PCA is done
+        
 
-
-        X_test = X1 # before it was X which was without PCA
+        #X_test = X1 # before it was X which was without PCA
+        X_test = X # before it was X which was without PCA
         y_test = Y
         y_pred = model.predict(X_test)
         y_pred = np.vectorize(reversefactor.get)(y_pred)

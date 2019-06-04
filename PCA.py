@@ -35,7 +35,7 @@ def pca(trainning_dataset):
 
   pca = PCA(n_components=21)
   pca.fit(X_new)
-  X1=pca.fit_transform(X)
+  X1=pca.fit_transform(X_new)
   print X1
 
 

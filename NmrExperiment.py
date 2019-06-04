@@ -144,6 +144,7 @@ class NmrExperiment:
         Y = Y.reshape(Y.shape[0],1)
         print("after factorization  Y data is :{} and shape is {}".format(Y,Y.shape))
 
+        '''
         # implementation of PCA #####
         sd = np.std(X, axis =0) 
         X_new = X[:,sd >= threshold]
@@ -153,6 +154,7 @@ class NmrExperiment:
         pca.fit(X_new)
         X1=pca.fit_transform(X) # X1 is the new dataset now
         #### implementation of PCA is done
+        '''
 
 
 
@@ -161,7 +163,8 @@ class NmrExperiment:
         model = RandomForestClassifier()
         average_error = 0
         outlier_index = 0
-        for (train_index, test_index), i in zip(cv.split(X1, Y), range(folds)): # before it was X which was without PCA
+        for (train_index, test_index), i in zip(cv.split(X, Y), range(folds)):
+        #for (train_index, test_index), i in zip(cv.split(X1, Y), range(folds)): # before it was X which was without PCA
             #print("checking value of i in fold:{}".format(i))
             X_train, X_test = X[train_index], X[test_index]
             #print(" X_train is:{} and shape is:{}\n X_test is:{} and shape is:{}".format(X_train,X_train.shape,X_test,X_test.shape))
@@ -388,7 +391,19 @@ class NmrExperiment:
         '''
 
 
-
+        '''
+        # implementation of PCA #####
+        threshold = 10**-3
+        sd = np.std(X, axis =0) 
+        X_new = X[:,sd >= threshold]
+        pca = PCA(n_components= X_new.shape[1])
+        pca.fit(X_new)
+        pca = PCA(n_components=21)
+        pca.fit(X_new)
+        X1=pca.fit_transform(X_new) # X1 is the new dataset now
+        #### implementation of PCA is done
+        '''
+        
 
 
 
@@ -400,6 +415,7 @@ class NmrExperiment:
         average_error = 0
         outlier_index = 0
         for (train_index, test_index), i in zip(cv.split(X, Y), range(folds)):
+        #for (train_index, test_index), i in zip(cv.split(X1, Y), range(folds)): # it was X before implementing the PCA analysis
             #print("checking value of i in fold:{}".format(i))
             X_train, X_test = X[train_index], X[test_index]
             #print(" X_train is:{} and shape is:{}\n X_test is:{} and shape is:{}".format(X_train,X_train.shape,X_test,X_test.shape))
