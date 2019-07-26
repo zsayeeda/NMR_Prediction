@@ -84,4 +84,4 @@ if __name__ == '__main__':
             print('%s is not a valid path, please verify' % folders)
             sys.exit()
     else:
-        print('Usage: python FilenameFinder.py folder or python FilenameFinder.py folder1 filename ')
+        print('Usage: python AssignmentToShiftFile.py folder or python AssignmentToShiftFile.py folder1 filename ')

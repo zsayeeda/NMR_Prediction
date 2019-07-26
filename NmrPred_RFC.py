@@ -11,6 +11,8 @@ from sklearn.preprocessing import LabelEncoder
 from sklearn.metrics import roc_curve, auc
 import pickle
 from sklearn.metrics import mean_absolute_error
+from sklearn.decomposition import PCA
+import matplotlib.pyplot as plt
 
 
 # if __name__ == '__main__':
@@ -186,7 +188,27 @@ def runPredictionWithCDK(trainingSetFile, testData):
         print("Y_training after classLabel:{}".format(Y_training))
         Y_training = Y_training.reshape(Y_training.shape[0],1)
         Y_training = Y_training.astype(int)
-        model.fit(X_training, Y_training)
+
+        '''
+        # implementation of PCA #####
+        print("PCA started")
+        threshold = 10**-3
+        sd = np.std(X_training, axis =0) 
+        X_new = X_training[:,sd >= threshold]
+        print("X_new defined")
+        pca = PCA(n_components= X_new.shape[1])
+        pca.fit(X_new)
+        pca = PCA(n_components=21)
+        pca.fit(X_new)
+        X1=pca.fit_transform(X_new) # X1 is the new dataset now
+        print("PCA end")
+
+        #### implementation of PCA is done
+        '''
+
+
+        model.fit(X_training, Y_training) #change here if u do not use PCA (uncommit)
+        #model.fit(X1, Y_training)
         print("training done")
     #    print("Saved model's average error was:{}".format(model_saved_in_train_phase["error"]))
     #    print("Saved best model is:{}".format(model))
@@ -239,9 +261,22 @@ def runPredictionWithCDK(trainingSetFile, testData):
             # reversefactor = dict(zip(range(len(factor[0])),definitions))
             # Y = Y.reshape(Y.shape[0],1)
             # print("after factorization  Y data is :{} and shape is {}".format(Y,Y.shape))
+        '''
+        # implementation of PCA #####
+        threshold = 10**-3
+        sd = np.std(X_training, axis =0) 
+        X_new = X[:,sd >= threshold]
+        pca = PCA(n_components= X_new.shape[1])
+        pca.fit(X_new)
+        pca = PCA(n_components=21)
+        pca.fit(X_new)
+        X1=pca.fit_transform(X_new) # X1 is the new dataset now
+        ### PCA done ##
+        '''
         average_error = 0
         outlier_index = 0
-        X_test = X
+        X_test = X # change here . uncommit when pca is not used
+        #X_test = X1
         y_test = Y
         y_pred = model.predict(X_test)
         print("Prediction phase passed successfully")
@@ -264,6 +299,18 @@ def runPredictionWithCDK(trainingSetFile, testData):
         error = 0
         outlier_num = 0
         test_arbitary = 0
+
+        group = np.array(["Predicted","True"])
+        cdict = {"Predicted": 'red', "True":'green'}
+        fig, ax = plt.subplots()
+        
+        ax.scatter(y_test, y_pred,c = ["red", "green"])
+
+        ax.legend()
+        plt.xlabel('True')
+        plt.ylabel('Predicted')
+        plt.show()
+
         for j in range(len(y_pred)):
             print("Printing prediction:{}------true:{}, HMDB_ID:{} and H position is:{}".format(y_pred[j], y_test[j],hmdb_ids[j],hydrogen_positions[j]))
             if abs(round(y_pred[j],2) - y_test[j]) <= 8.00: # it was 20.0
@@ -278,6 +325,8 @@ def runPredictionWithCDK(trainingSetFile, testData):
         error = error / len(y_pred)
         print("avg error in holdout test:{}".format(error))  
         print("total number of outliers:{}".format(outlier_num))
+
+        
     except:
         print("error occur in holdout prediction")
 
@@ -289,12 +338,14 @@ if __name__ == '__main__':
     #trainingSetFile = "/Users/zinatsayeeda/anaconda3/envs/rdkit/whole_training_nmr_3000_plus_instance.csv"
     #trainingSetFile = "/Users/zinatsayeeda/anaconda3/envs/rdkit/training_nmr_1st_priority.csv"
     #trainingSetFile = "/Users/zinatsayeeda/anaconda3/envs/rdkit/training_nmr_1st_2nd_priority_megred.csv"
-    trainingSetFile = "/Users/zinatsayeeda/anaconda3/envs/rdkit/training_nmr_1st_2nd_priority_without_2D.csv"
+    #trainingSetFile = "/Users/zinatsayeeda/anaconda3/envs/rdkit/training_nmr_1st_2nd_priority_without_2D.csv"
+    trainingSetFile = "/Users/zinatsayeeda/anaconda3/envs/rdkit/training_nmr_1st_2nd_priority_all_atom.csv"
     #trainingSetFile = "/Users/zinatsayeeda/anaconda3/envs/rdkit/training_nmr_1st_2nd_priority_megred_2.csv"
     #testData = "/Users/zinatsayeeda/anaconda3/envs/rdkit/whole_test_nmr.csv"
     #testData = "/Users/zinatsayeeda/anaconda3/envs/rdkit/holdout_nmr.csv"
     #testData = "/Users/zinatsayeeda/anaconda3/envs/rdkit/holdout_nmr_2.csv"
-    testData = "/Users/zinatsayeeda/anaconda3/envs/rdkit/holdout_nmr_test4.csv"
+    # testData = "/Users/zinatsayeeda/anaconda3/envs/rdkit/holdout_nmr_test4.csv"
+    testData = "/Users/zinatsayeeda/anaconda3/envs/rdkit/holdout_nmr_test5.csv"
     print("Start")
     print("Start with:{}".format(sys.argv[1]))
     exp = NmrExp.NmrExperiment(sys.argv[1])

@@ -30,8 +30,9 @@ class NmrExperiment:
         test_folder = "/Users/zinatsayeeda/anaconda3/envs/rdkit/test/"
         #trainingSetFile = "/Users/zinatsayeeda/anaconda3/envs/rdkit/whole_training_nmr_1063_instance.csv" # used only those descriptors I have generated using CDK
         #trainingSetFile = "/Users/zinatsayeeda/anaconda3/envs/rdkit/training_nmr_1st_priority.csv" # used only those descriptors I have generated using CDK
-        trainingSetFile = "/Users/zinatsayeeda/anaconda3/envs/rdkit/training_nmr_1st_2nd_priority_megred.csv" # used only those descriptors I have generated using CDK
-        trainingSetFile = "/Users/zinatsayeeda/anaconda3/envs/rdkit/training_nmr_1st_2nd_priority_without_2D.csv" # used only those descriptors I have generated using CDK
+        #trainingSetFile = "/Users/zinatsayeeda/anaconda3/envs/rdkit/training_nmr_1st_2nd_priority_megred.csv" # used only those descriptors I have generated using CDK
+        #trainingSetFile = "/Users/zinatsayeeda/anaconda3/envs/rdkit/training_nmr_1st_2nd_priority_without_2D.csv" # used only those descriptors I have generated using CDK
+        trainingSetFile = "/Users/zinatsayeeda/anaconda3/envs/rdkit/training_nmr_1st_2nd_priority_all_atom.csv" # used only those descriptors I have generated using CDK
         #trainingSetFile = "/Users/zinatsayeeda/anaconda3/envs/rdkit/training_nmr_1st_2nd_priority_megred_2.csv"
         #trainingSetFile = "/Users/zinatsayeeda/anaconda3/envs/rdkit/whole_training_nmr_3000_plus_instance.csv" # used only those descriptors I have generated using CDK
         # try:
@@ -53,7 +54,7 @@ class NmrExperiment:
     def buildTrainingClassification(self, folder):
         feature_factor = 4
         nmr_structures = []  
-        nmr_structures = self.getChemicalShifts(folder) # retruns array of nmr structures. assign carbon position and chemical shifts in nmr structures. assign checmical shift classes also which is chemical_shift/100 to get 1000 classes
+        nmr_structures = self.getChemicalShifts(folder) # retruns array of nmr structures. assign carbon(H) position and chemical shifts in nmr structures. assign checmical shift classes also which is chemical_shift/100 to get 1000 classes
                                                         # this is the first time NmrStructure.py file is callled 
                                                         # also hmdbid is assigned for the structure           
         print("The NMR STRUCTURES after getting chemical shifts:{}".format(nmr_structures))
@@ -322,7 +323,7 @@ class NmrExperiment:
 # This function is for testing purpose to check what result the random forest provides with the training set I have created seperately using CDK
     def runClassifierWithCDK(self, trainingSetFile):
         print("#########    Random forest model train started ##############\n")
-        folds = 10
+        folds = 5
         true_values = [[]]
         predicted_values = [[]]
         #train = None
@@ -404,6 +405,7 @@ class NmrExperiment:
         #### implementation of PCA is done
         '''
         
+        
 
 
 
@@ -414,7 +416,7 @@ class NmrExperiment:
         model = RandomForestClassifier()
         average_error = 0
         outlier_index = 0
-        for (train_index, test_index), i in zip(cv.split(X, Y), range(folds)):
+        for (train_index, test_index), i in zip(cv.split(X, Y), range(folds)): #change here. uncommit it when PCA is not used
         #for (train_index, test_index), i in zip(cv.split(X1, Y), range(folds)): # it was X before implementing the PCA analysis
             #print("checking value of i in fold:{}".format(i))
             X_train, X_test = X[train_index], X[test_index]

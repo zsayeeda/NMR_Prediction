@@ -11,9 +11,11 @@ def main():
   #file_path = "/Users/zinatsayeeda/anaconda3/envs/rdkit/test_1/log_out_2.txt"
   #file_path = "/Users/zinatsayeeda/anaconda3/envs/rdkit/test_3/log_out.txt"
   #file_path = "/Users/zinatsayeeda/anaconda3/envs/rdkit/test_4/log_out.txt"
+  #file_path = "/Users/zinatsayeeda/anaconda3/envs/rdkit/test_5/log_out.txt"
   #file_path = "/Users/zinatsayeeda/anaconda3/envs/rdkit/dataset/dataset_1st_priority/log_out.txt" # change here the file name
   #file_path = "/Users/zinatsayeeda/anaconda3/envs/rdkit/dataset/dataset_2nd_priority/log_out.txt"
-  file_path = "/Users/zinatsayeeda/anaconda3/envs/rdkit/dataset/dataset_1st_2nd_priority/log_out.txt"
+  #file_path = "/Users/zinatsayeeda/anaconda3/envs/rdkit/dataset/dataset_1st_2nd_priority/log_out.txt"
+  file_path = "//Users/zinatsayeeda/anaconda3/envs/rdkit/dataset/dataset_1st_2nd_priority_with_all_atoms/log_out.txt"
   file_text = open(file_path).read()
   file_blocks = file_text.split("file entry in create structure:")
   print("file blocks are:{}".format(file_blocks))
@@ -52,7 +54,9 @@ def main():
     print("For block:{}, HMDB IDs:{}, H Positions:{} and Descriptor Values:{}".format(i, hmdb_id,hydrogen_position,descriptors_final_values))
     #chem_file_path = "/Users/zinatsayeeda/anaconda3/envs/rdkit/test_1/"+array_of_lines_in_each_block[0].split(".sdf")[0] #change the path here
     #chem_file_path = "/Users/zinatsayeeda/anaconda3/envs/rdkit/test_4/"+array_of_lines_in_each_block[0].split(".sdf")[0] #change the path here
-    chem_file_path = "/Users/zinatsayeeda/anaconda3/envs/rdkit/dataset/dataset_1st_2nd_priority/"+array_of_lines_in_each_block[0].split(".sdf")[0] #change the path here
+    #chem_file_path = "/Users/zinatsayeeda/anaconda3/envs/rdkit/test_5/"+array_of_lines_in_each_block[0].split(".sdf")[0] #change the path here
+    chem_file_path = "/Users/zinatsayeeda/anaconda3/envs/rdkit/dataset/dataset_1st_2nd_priority_with_all_atoms/"+array_of_lines_in_each_block[0].split(".sdf")[0] #change the path here
+    #chem_file_path = "/Users/zinatsayeeda/anaconda3/envs/rdkit/dataset/dataset_1st_2nd_priority/"+array_of_lines_in_each_block[0].split(".sdf")[0] #change the path here
     print("chem file path:{}".format(chem_file_path))
     H_position_and_chemicalshift_in_shift_file = ReadShiftFile1(chem_file_path,hydrogen_position)
     print("in chemical shift file{}".format(H_position_and_chemicalshift_in_shift_file))
@@ -65,7 +69,9 @@ def main():
   #with open('/Users/zinatsayeeda/anaconda3/envs/rdkit/test_1/holdout_nmr_2.csv', 'w') as csv_file:
   #with open('/Users/zinatsayeeda/anaconda3/envs/rdkit/dataset/dataset_1st_priority/training_nmr_1st_priority.csv', 'w') as csv_file: #change path and file name here too
   #with open('/Users/zinatsayeeda/anaconda3/envs/rdkit/test_4/holdout_nmr_test4.csv', 'w') as csv_file: #change path and file name here too
-  with open('/Users/zinatsayeeda/anaconda3/envs/rdkit/dataset/dataset_1st_2nd_priority/training_nmr_1st_2nd_priority_without_2D.csv', 'w') as csv_file: #change path and file name here too
+  #with open('/Users/zinatsayeeda/anaconda3/envs/rdkit/test_5/holdout_nmr_test5.csv', 'w') as csv_file: #change path and file name here too
+  with open('/Users/zinatsayeeda/anaconda3/envs/rdkit/dataset/dataset_1st_2nd_priority_with_all_atoms/training_nmr_1st_2nd_priority_all_atom.csv', 'w') as csv_file: #change path and file name here too
+  #with open('/Users/zinatsayeeda/anaconda3/envs/rdkit/dataset/dataset_1st_2nd_priority/training_nmr_1st_2nd_priority_without_2D.csv', 'w') as csv_file: #change path and file name here too
     writer = csv.writer(csv_file)
     writer.writerow(header)
     for i in range(len(dataset_array)):

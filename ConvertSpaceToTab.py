@@ -20,11 +20,15 @@ def ToTab(parentFolder, file_name):
                     for i in range(2,len(text)):
                         print("in shift file line:{} is:{}".format(i, text[i]))
                         if text[i].find(" ") > 0:
+                            print("reached space")
                             items = text[i].split(" ")
-                            new_file.write(items[0]+"\t"+items[2])
+                            len_of_items = len(items)
+                            new_file.write(items[0]+"\t"+items[len_of_items-1])
                         else:
+                            print("reached tab")
                             items = text[i].split("\t")
-                            new_file.write(items[0]+"\t"+items[1])
+                            len_of_items = len(items)
+                            new_file.write(items[0]+"\t"+items[len_of_items-1])
             
                 new_file.close()
 
